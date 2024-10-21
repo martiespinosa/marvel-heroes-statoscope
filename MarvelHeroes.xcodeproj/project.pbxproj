@@ -6,6 +6,10 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		41A7B52D2CC640050025494A /* Statoscope in Frameworks */ = {isa = PBXBuildFile; productRef = 41A7B52C2CC640050025494A /* Statoscope */; };
+/* End PBXBuildFile section */
+
 /* Begin PBXFileReference section */
 		41792AA82CC638F500F0618B /* MarvelHeroes.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MarvelHeroes.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -23,6 +27,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				41A7B52D2CC640050025494A /* Statoscope in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -65,6 +70,7 @@
 			);
 			name = MarvelHeroes;
 			packageProductDependencies = (
+				41A7B52C2CC640050025494A /* Statoscope */,
 			);
 			productName = MarvelHeroes;
 			productReference = 41792AA82CC638F500F0618B /* MarvelHeroes.app */;
@@ -94,6 +100,9 @@
 			);
 			mainGroup = 41792A9F2CC638F500F0618B;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				41A7B52B2CC640050025494A /* XCRemoteSwiftPackageReference "statoscope" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 41792AA92CC638F500F0618B /* Products */;
 			projectDirPath = "";
@@ -260,6 +269,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -289,6 +299,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/Frameworks",
@@ -324,6 +335,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		41A7B52B2CC640050025494A /* XCRemoteSwiftPackageReference "statoscope" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/InQBarna/statoscope.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.1.2;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		41A7B52C2CC640050025494A /* Statoscope */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 41A7B52B2CC640050025494A /* XCRemoteSwiftPackageReference "statoscope" */;
+			productName = Statoscope;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 41792AA02CC638F500F0618B /* Project object */;
 }
