@@ -43,6 +43,7 @@ struct MarvelThumbnail: Codable {
     let `extension`: String
     
     var url: URL {
-        URL(string: "\(path).\(self.extension)")!
+        let securePath = path.replacingOccurrences(of: "http://", with: "https://")
+        return URL(string: "\(securePath).\(self.extension)")!
     }
 }
