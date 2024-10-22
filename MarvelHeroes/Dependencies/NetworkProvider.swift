@@ -6,9 +6,18 @@
 //
 
 import Foundation
+import Statoscope
 
 struct NetworkProvider {
     let fetchData: (URLRequest) async throws -> Data
+}
+
+struct NetworkEffect: Effect, Equatable {
+    typealias ResultType = Data
+    let request: URLRequest
+    func runEffect() async throws -> Data {
+        try await Providers.defaultNetworkProvider.fetchData(request)
+    }
 }
 
 extension Providers {

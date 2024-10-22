@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		67678B232CC79F3F0041AA3A /* SystemProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67678B222CC79F3F0041AA3A /* SystemProvider.swift */; };
 		67DFAB2C2CC78A9600065598 /* MarvelHeroesApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 67DFAB2B2CC78A9600065598 /* MarvelHeroesApp.swift */; };
 		67DFAB302CC78A9700065598 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 67DFAB2F2CC78A9700065598 /* Assets.xcassets */; };
 		67DFAB342CC78A9700065598 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 67DFAB332CC78A9700065598 /* Preview Assets.xcassets */; };
@@ -37,6 +38,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		67678B222CC79F3F0041AA3A /* SystemProvider.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SystemProvider.swift; sourceTree = "<group>"; };
 		67DFAB282CC78A9600065598 /* MarvelHeroes.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MarvelHeroes.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		67DFAB2B2CC78A9600065598 /* MarvelHeroesApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MarvelHeroesApp.swift; sourceTree = "<group>"; };
 		67DFAB2F2CC78A9700065598 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -167,6 +169,7 @@
 			children = (
 				67DFAB732CC78C0B00065598 /* NetworkProvider.swift */,
 				67DFAB752CC78C1C00065598 /* Providers.swift */,
+				67678B222CC79F3F0041AA3A /* SystemProvider.swift */,
 			);
 			path = Dependencies;
 			sourceTree = "<group>";
@@ -297,6 +300,7 @@
 				67DFAB6A2CC78AD800065598 /* HeroView.swift in Sources */,
 				67DFAB762CC78C1C00065598 /* Providers.swift in Sources */,
 				67DFAB692CC78AD800065598 /* HeroDetailView.swift in Sources */,
+				67678B232CC79F3F0041AA3A /* SystemProvider.swift in Sources */,
 				67DFAB682CC78AD800065598 /* ContentView.swift in Sources */,
 				67DFAB662CC78AD800065598 /* APIKeys.swift in Sources */,
 				67DFAB6B2CC78AD800065598 /* ContentView-VM.swift in Sources */,

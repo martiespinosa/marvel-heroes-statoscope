@@ -22,11 +22,22 @@ extension Data {
 class MarvelAPI {
     
     static func fetchMarvelCharacters(
-        provider: NetworkProvider
+        provider: NetworkProvider,
+        dateProvider: SystemProvider
     ) async throws -> [MarvelCharacter] {
+        try parseMarveCharactersResponse(
+            data: try await provider.fetchData(
+                try fetchMarvelCharactersRequest(dateProvider: dateProvider)
+            )
+        )
+    }
+    
+    static func fetchMarvelCharactersRequest(
+        dateProvider: SystemProvider
+    ) throws -> URLRequest {
         let publicKey = MarvelAPIKeys.publicKey
         let privateKey = MarvelAPIKeys.privateKey
-        let timestamp = String(Int(Date().timeIntervalSince1970))
+        let timestamp = String(Int(dateProvider.date().timeIntervalSince1970))
         
         let hash = (timestamp + privateKey + publicKey).data(using: .utf8)!.md5()
         
@@ -35,13 +46,12 @@ class MarvelAPI {
         guard let url = URL(string: urlString) else {
             throw URLError(.badURL)
         }
-        
-        // let (data, _) = try await URLSession.shared.data(from: url)
-        let data = try await provider.fetchData(URLRequest(url: url))
-
+        return URLRequest(url: url)
+    }
+    
+    static func parseMarveCharactersResponse(data: Data) throws -> [MarvelCharacter] {
         let decoder = JSONDecoder()
         let marvelResponse = try decoder.decode(MarvelResponse.self, from: data)
-        
         return marvelResponse.data.results
     }
 }
