@@ -9,11 +9,11 @@ import SwiftUI
 
 struct HeroView: View {
     
-    let hero: MarvelCharacter
+    let hero: MarvelCharacterVM
     
     var body: some View {
         HStack(alignment: .top) {
-            AsyncImage(url: hero.thumbnail.url) { image in
+            AsyncImage(url: hero.imageURL) { image in
                 image
                     .resizable()
                     .scaledToFit()
@@ -27,7 +27,7 @@ struct HeroView: View {
             VStack(alignment: .leading) {
                 Text(hero.name)
                     .font(.headline)
-                Text(hero.description ?? "")
+                Text(hero.description)
                     .foregroundStyle(.secondary)
             }
         }

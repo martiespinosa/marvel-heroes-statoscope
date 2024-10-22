@@ -7,6 +7,7 @@
 
 import Foundation
 import CommonCrypto
+import Statoscope
 
 extension Data {
     func md5() -> String {
@@ -19,7 +20,10 @@ extension Data {
 }
 
 class MarvelAPI {
-    static func fetchMarvelCharacters() async throws -> [MarvelCharacter] {
+    
+    static func fetchMarvelCharacters(
+        provider: NetworkProvider
+    ) async throws -> [MarvelCharacter] {
         let publicKey = MarvelAPIKeys.publicKey
         let privateKey = MarvelAPIKeys.privateKey
         let timestamp = String(Int(Date().timeIntervalSince1970))
@@ -32,8 +36,9 @@ class MarvelAPI {
             throw URLError(.badURL)
         }
         
-        let (data, _) = try await URLSession.shared.data(from: url)
-        
+        // let (data, _) = try await URLSession.shared.data(from: url)
+        let data = try await provider.fetchData(URLRequest(url: url))
+
         let decoder = JSONDecoder()
         let marvelResponse = try decoder.decode(MarvelResponse.self, from: data)
         

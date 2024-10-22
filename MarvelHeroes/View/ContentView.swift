@@ -38,7 +38,7 @@ struct ContentView: View {
         }
         .onChange(of: vm.characters) {
             print(vm.characters.map { $0.name }.joined(separator: "\n"))
-            print(vm.characters.map { $0.thumbnail.url })
+            print(vm.characters.map { $0.imageURL.absoluteString })
         }
     }
 }

@@ -9,12 +9,12 @@ import SwiftUI
 
 struct HeroDetailView: View {
     
-    let hero: MarvelCharacter
+    let hero: MarvelCharacterVM
     
     var body: some View {
         ScrollView {
             VStack(alignment: .leading) {
-                AsyncImage(url: hero.thumbnail.url) { image in
+                AsyncImage(url: hero.imageURL) { image in
                     image
                         .resizable()
                         .scaledToFit()
@@ -28,7 +28,7 @@ struct HeroDetailView: View {
                 Text(hero.name)
                     .font(.headline)
                 
-                Text(hero.description ?? "")
+                Text(hero.description)
                     .foregroundStyle(.secondary)
             }
         }
