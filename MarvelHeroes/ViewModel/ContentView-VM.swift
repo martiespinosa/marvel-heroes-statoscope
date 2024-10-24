@@ -21,11 +21,15 @@ struct MarvelCharacterVM: Equatable, Identifiable {
 extension ContentView {
     
     @Observable
-    class ViewModel: ObservableObject {
+    final class ViewModel {
         
         var characters: [MarvelCharacterVM] = []
         var errorMessage: String?
         var isLoading = false
+        
+        var isShowingError: Bool { errorMessage != nil }
+        var currentPage = 0
+        var allCharactersLoaded = false
         
         func fetchCharacters() async {
             isLoading = true
@@ -61,6 +65,7 @@ extension ContentView {
             case fetchCharacters
             case fetchCharactersCompleted(Data)
         }
+        
         func update(_ when: When) throws {
             switch when {
             case .fetchCharacters:
@@ -76,18 +81,13 @@ extension ContentView {
                 dateProvider: systemProvider
             )
             effectsState.enqueue(
-                /*
-                AnyEffect {
-                    try await Providers.defaultNetworkProvider.fetchData(req)
-                }
-                 */
                 NetworkEffect(request: req)
                     .map(When.fetchCharactersCompleted)
             )
         }
         
         private func fetchCharactersCompleted(_ data: Data) throws {
-            let response = try MarvelAPI.parseMarveCharactersResponse(data: data)
+            let response = try MarvelAPI.parseMarvelCharactersResponse(data: data)
             self.characters = response.map {
                 MarvelCharacterVM(
                     name: $0.name,

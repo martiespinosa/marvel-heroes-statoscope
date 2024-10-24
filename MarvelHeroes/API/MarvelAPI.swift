@@ -25,7 +25,7 @@ class MarvelAPI {
         provider: NetworkProvider,
         dateProvider: SystemProvider
     ) async throws -> [MarvelCharacter] {
-        try parseMarveCharactersResponse(
+        try parseMarvelCharactersResponse(
             data: try await provider.fetchData(
                 try fetchMarvelCharactersRequest(dateProvider: dateProvider)
             )
@@ -49,7 +49,7 @@ class MarvelAPI {
         return URLRequest(url: url)
     }
     
-    static func parseMarveCharactersResponse(data: Data) throws -> [MarvelCharacter] {
+    static func parseMarvelCharactersResponse(data: Data) throws -> [MarvelCharacter] {
         let decoder = JSONDecoder()
         let marvelResponse = try decoder.decode(MarvelResponse.self, from: data)
         return marvelResponse.data.results

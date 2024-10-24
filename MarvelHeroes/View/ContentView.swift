@@ -29,16 +29,19 @@ struct ContentView: View {
                     }
                 }
             }
+            .alert("Error", isPresented: .constant(vm.isShowingError), actions: {
+                Button("OK") {
+                    vm.errorMessage = nil
+                }
+            }, message: {
+                Text(vm.errorMessage ?? "Unknown error")
+            })
             .navigationTitle("Marvel Heroes")
         }
         .onAppear {
             Task {
                 await vm.fetchCharacters()
             }
-        }
-        .onChange(of: vm.characters) {
-            print(vm.characters.map { $0.name }.joined(separator: "\n"))
-            print(vm.characters.map { $0.imageURL.absoluteString })
         }
     }
 }
