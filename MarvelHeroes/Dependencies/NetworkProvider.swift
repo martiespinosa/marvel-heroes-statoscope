@@ -13,10 +13,16 @@ struct NetworkProvider {
 }
 
 struct NetworkEffect: Effect, Equatable {
-    typealias ResultType = Data
+    typealias ResultType = Result<Data, Error>
     let request: URLRequest
-    func runEffect() async throws -> Data {
-        try await Providers.defaultNetworkProvider.fetchData(request)
+    
+    func runEffect() async throws -> Result<Data, Error> {
+        do {
+            let data = try await Providers.defaultNetworkProvider.fetchData(request)
+            return .success(data)
+        } catch {
+            return .failure(error)
+        }
     }
 }
 

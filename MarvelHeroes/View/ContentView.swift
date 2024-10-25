@@ -10,9 +10,7 @@ import SwiftUI
 
 struct ContentView: View {
     
-    @StateObject private var vm = ViewModelV2()
-        .injectObject(Providers.defaultNetworkProvider)
-        .injectObject(Providers.defaultSystemProvider)
+    @EnvironmentObject var vm: ViewModelV2
     
     var body: some View {
         NavigationStack {
@@ -49,8 +47,24 @@ struct ContentView: View {
 
 #Preview {
     ContentView()
+        .environmentObject(ContentView.ViewModelV2()
+            .injectObject(Providers.defaultNetworkProvider)
+            .injectObject(Providers.defaultSystemProvider))
 }
 
 #Preview {
     ContentView()
+        .environmentObject(ContentView.ViewModelV2()
+            .set(\.errorMessage, "Ha habido un error")
+            .injectObject(Providers.defaultNetworkProvider)
+            .injectObject(Providers.defaultSystemProvider))
+}
+
+#Preview {
+    ContentView()
+        .environmentObject(ContentView.ViewModelV2()
+            .set(\.isBottomLoading, true)
+            .set(\.characters, [MarvelCharacterVM(name: "Iron Man", imageURL: URL(string: "about:blank")!, description: "Iron man description")])
+            .injectObject(Providers.defaultNetworkProvider)
+            .injectObject(Providers.defaultSystemProvider))
 }

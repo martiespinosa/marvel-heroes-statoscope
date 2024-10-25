@@ -23,16 +23,19 @@ class MarvelAPI {
     
     static func fetchMarvelCharacters(
         provider: NetworkProvider,
-        dateProvider: SystemProvider
+        dateProvider: SystemProvider,
+        limit: Int,
+        offset: Int
     ) async throws -> [MarvelCharacter] {
-        try parseMarvelCharactersResponse(
-            data: try await provider.fetchData(
-                try fetchMarvelCharactersRequest(dateProvider: dateProvider)
-            )
+        let request = try fetchMarvelCharactersRequest(limit: limit, offset: offset, dateProvider: dateProvider)
+        return try parseMarvelCharactersResponse(
+            data: try await provider.fetchData(request)
         )
     }
     
     static func fetchMarvelCharactersRequest(
+        limit: Int,
+        offset: Int,
         dateProvider: SystemProvider
     ) throws -> URLRequest {
         let publicKey = MarvelAPIKeys.publicKey
@@ -41,7 +44,7 @@ class MarvelAPI {
         
         let hash = (timestamp + privateKey + publicKey).data(using: .utf8)!.md5()
         
-        let urlString = "https://gateway.marvel.com/v1/public/characters?ts=\(timestamp)&apikey=\(publicKey)&hash=\(hash)"
+        let urlString = "https://gateway.marvel.com/v1/public/characters?limit=\(limit)&offset=\(offset)&ts=\(timestamp)&apikey=\(publicKey)&hash=\(hash)"
         
         guard let url = URL(string: urlString) else {
             throw URLError(.badURL)

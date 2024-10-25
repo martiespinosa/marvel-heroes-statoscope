@@ -12,6 +12,9 @@ struct MarvelHeroesApp: App {
     var body: some Scene {
         WindowGroup {
             ContentView()
+                .environmentObject(ContentView.ViewModelV2()
+                    .injectObject(Providers.defaultNetworkProvider)
+                    .injectObject(Providers.defaultSystemProvider))
         }
     }
 }
