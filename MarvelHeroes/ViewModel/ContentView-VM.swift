@@ -83,15 +83,35 @@ extension ContentView {
                 errorMessage = nil
             case .userScrollToBottom:
                 if !isLoading && !allCharactersLoaded {
-                    try fetchCharacters()
+                    try fetchMoreCharacters()
                 }
             }
         }
         
         private func fetchCharacters() throws {
             isLoading = true
+            currentPage = 0
+            let limit = 20
+            let offset = currentPage * limit
+            
+            let req = try MarvelAPI.fetchMarvelCharactersRequest(
+                limit: limit,
+                offset: offset,
+                dateProvider: systemProvider
+            )
+            
+            effectsState.enqueue(
+                NetworkEffect(request: req)
+                    .map { result in
+                        When.fetchCharactersCompleted(result, page: self.currentPage)
+                    }
+            )
+        }
+        
+        private func fetchMoreCharacters() throws {
+            isBottomLoading = true
             currentPage += 1
-            let limit = 10
+            let limit = 20
             let offset = currentPage * limit
             
             let req = try MarvelAPI.fetchMarvelCharactersRequest(
@@ -132,6 +152,7 @@ extension ContentView {
             }
             
             isLoading = false
+            isBottomLoading = false
         }
     }
 }

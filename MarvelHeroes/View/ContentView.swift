@@ -25,6 +25,14 @@ struct ContentView: View {
                             } label: {
                                 HeroView(hero: character)
                             }
+                            .onAppear {
+                                if character == vm.characters.last {
+                                    vm.send(.userScrollToBottom)
+                                }
+                            }
+                        }
+                        if vm.isBottomLoading {
+                            ProgressView()
                         }
                     }
                 }
