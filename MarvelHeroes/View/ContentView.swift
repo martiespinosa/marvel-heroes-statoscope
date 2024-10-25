@@ -10,13 +10,15 @@ import SwiftUI
 
 struct ContentView: View {
     
-    @State private var vm = ViewModel()
+    @StateObject private var vm = ViewModelV2()
+        .injectObject(Providers.defaultNetworkProvider)
+        .injectObject(Providers.defaultSystemProvider)
     
     var body: some View {
         NavigationStack {
             Group {
                 if vm.isLoading {
-                    ProgressView("Fetching Heroes…")
+                    ProgressView("Fetching Heroes…")    
                 } else {
                     List {
                         ForEach(vm.characters) { character in
@@ -31,7 +33,7 @@ struct ContentView: View {
             }
             .alert("Error", isPresented: .constant(vm.isShowingError), actions: {
                 Button("OK") {
-                    vm.errorMessage = nil
+                    vm.send(.userTapOnErrorAlert)
                 }
             }, message: {
                 Text(vm.errorMessage ?? "Unknown error")
@@ -39,11 +41,14 @@ struct ContentView: View {
             .navigationTitle("Marvel Heroes")
         }
         .onAppear {
-            Task {
-                await vm.fetchCharacters()
-            }
+            StatoscopeLogger.logLevel = [.errors, .when, .effects, /*.stateDiff,*/ .injection]
+            vm.send(.fetchCharacters)
         }
     }
+}
+
+#Preview {
+    ContentView()
 }
 
 #Preview {

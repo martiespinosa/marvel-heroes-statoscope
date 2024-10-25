@@ -46,12 +46,15 @@ class MarvelAPI {
         guard let url = URL(string: urlString) else {
             throw URLError(.badURL)
         }
+        print("fetching marvel characters")
         return URLRequest(url: url)
     }
     
     static func parseMarvelCharactersResponse(data: Data) throws -> [MarvelCharacter] {
         let decoder = JSONDecoder()
+        print("trying to parse marvel characters")
         let marvelResponse = try decoder.decode(MarvelResponse.self, from: data)
+        print("parsing marvel characters")
         return marvelResponse.data.results
     }
 }

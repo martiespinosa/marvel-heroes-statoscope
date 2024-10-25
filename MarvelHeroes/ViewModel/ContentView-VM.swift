@@ -28,8 +28,8 @@ extension ContentView {
         var isLoading = false
         
         var isShowingError: Bool { errorMessage != nil }
-        var currentPage = 0
-        var allCharactersLoaded = false
+        private var currentPage = 0
+        private var allCharactersLoaded = false
         
         func fetchCharacters() async {
             isLoading = true
@@ -59,11 +59,16 @@ extension ContentView {
         @Published var errorMessage: String?
         @Published var isLoading = false
         
+        var isShowingError: Bool { errorMessage != nil }
+        @Published private var currentPage = 0
+        @Published private var allCharactersLoaded = false
+        
         @Injected var systemProvider: SystemProvider
         
         enum When {
             case fetchCharacters
             case fetchCharactersCompleted(Data)
+            case userTapOnErrorAlert
         }
         
         func update(_ when: When) throws {
@@ -72,6 +77,8 @@ extension ContentView {
                 try fetchCharacters()
             case .fetchCharactersCompleted(let response):
                 try fetchCharactersCompleted(response)
+            case .userTapOnErrorAlert:
+                errorMessage = nil
             }
         }
         
@@ -87,7 +94,9 @@ extension ContentView {
         }
         
         private func fetchCharactersCompleted(_ data: Data) throws {
+            print("starting fetching")
             let response = try MarvelAPI.parseMarvelCharactersResponse(data: data)
+            print("continuing fetching")
             self.characters = response.map {
                 MarvelCharacterVM(
                     name: $0.name,
