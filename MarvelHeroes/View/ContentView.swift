@@ -11,6 +11,15 @@ import SwiftUI
 struct ContentView: View {
     
     @EnvironmentObject var vm: ViewModel
+    @State private var searchText = ""
+    
+    private var filteredCharacters: [MarvelCharacterVM] {
+        if searchText.isEmpty {
+            return vm.characters
+        } else {
+            return vm.characters.filter { $0.name.localizedCaseInsensitiveContains(searchText) }
+        }
+    }
     
     var body: some View {
         NavigationStack {
@@ -19,24 +28,29 @@ struct ContentView: View {
                     ProgressView("Fetching Heroes…")    
                 } else {
                     List {
-                        ForEach(vm.characters) { character in
+                        ForEach(filteredCharacters) { character in
                             NavigationLink {
                                 HeroDetailView(hero: character)
                             } label: {
                                 HeroView(hero: character)
                             }
                             .onAppear {
-                                if character == vm.characters.last {
+                                let lastIndexMinusTen = vm.characters.count - 10
+                                if lastIndexMinusTen >= 0 && character == vm.characters[lastIndexMinusTen] {
                                     vm.send(.userScrollToBottom)
                                 }
                             }
                         }
                         if vm.isBottomLoading {
-                            ProgressView()
+                            Section(footer: Text("Loading more...")) {
+                                EmptyView()
+                            }
+                            .frame(maxWidth: .infinity, alignment: .center)
                         }
                     }
                 }
             }
+            .searchable(text: $searchText)
             .alert("Error", isPresented: .constant(vm.isShowingError), actions: {
                 Button("OK") {
                     vm.send(.userTapOnErrorAlert)
