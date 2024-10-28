@@ -49,8 +49,8 @@ final class MarvelHeroesUnitTest: XCTestCase {
     }
     
     func testListFlow() throws {
-        try ContentView.ViewModelV2.GIVEN {
-            ContentView.ViewModelV2()
+        try ContentView.ViewModel.GIVEN {
+            ContentView.ViewModel()
                 .injectObject(SystemProvider(date: {
                     Date(timeIntervalSince1970: 0)
                 }))

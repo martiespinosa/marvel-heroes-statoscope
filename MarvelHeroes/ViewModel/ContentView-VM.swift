@@ -16,45 +16,17 @@ struct MarvelCharacterVM: Equatable, Identifiable {
     let name: String
     let imageURL: URL
     let description: String
+    
+    static let example: Self = .init(
+        name: "A-Bomb (HAS)",
+        imageURL: URL(string: "https://i.annihil.us/u/prod/marvel/i/mg/3/20/5232158de5b16.jpg")!,
+        description: "Rick Jones has been Hulk's best bud since day one, but now he's more than a friend...he's a teammate! Transformed by a Gamma energy explosion, A-Bomb's thick, armored skin is just as strong and powerful as it is blue. And when he curls into action, he uses it like a giant bowling ball of destruction!"
+    )
 }
 
 extension ContentView {
-    
-//    @Observable
-//    final class ViewModel {
-//        
-//        var characters: [MarvelCharacterVM] = []
-//        var errorMessage: String?
-//        var isLoading = false
-//        
-//        var isShowingError: Bool { errorMessage != nil }
-//        private var currentPage = 0
-//        private var allCharactersLoaded = false
-//        
-//        func fetchCharacters() async {
-//            isLoading = true
-//            do {
-//                let characters = try await MarvelAPI.fetchMarvelCharacters(
-//                    provider: Providers.defaultNetworkProvider,
-//                    dateProvider: Providers.defaultSystemProvider
-//                )
-//                self.characters = characters.map {
-//                    MarvelCharacterVM(
-//                        name: $0.name,
-//                        imageURL: $0.thumbnail.url,
-//                        description: $0.description ?? ""
-//                    )
-//                }
-//            } catch {
-//                self.errorMessage = error.localizedDescription
-//                print("Error fetching characters: \(error)")
-//            }
-//            isLoading = false
-//        }
-//    }
-    
-    final class ViewModelV2: Statostore, ObservableObject {
-        
+    final class ViewModel: Statostore, ObservableObject {
+
         @Published var characters: [MarvelCharacterVM] = []
         @Published var errorMessage: String?
         @Published var isLoading = false

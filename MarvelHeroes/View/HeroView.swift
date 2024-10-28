@@ -29,11 +29,12 @@ struct HeroView: View {
                     .font(.headline)
                 Text(hero.description)
                     .foregroundStyle(.secondary)
+                    .lineLimit(1)
             }
         }
     }
 }
 
-//#Preview {
-//    HeroView()
-//}
+#Preview {
+    HeroView(hero: .example)
+}

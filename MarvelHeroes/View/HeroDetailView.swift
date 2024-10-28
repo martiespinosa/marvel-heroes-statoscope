@@ -13,7 +13,7 @@ struct HeroDetailView: View {
     
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading) {
+            VStack(alignment: .leading, spacing: 16) {
                 AsyncImage(url: hero.imageURL) { image in
                     image
                         .resizable()
@@ -25,18 +25,16 @@ struct HeroDetailView: View {
                 }
                 .frame(maxWidth: .infinity)
                 
-                Text(hero.name)
-                    .font(.headline)
-                
                 Text(hero.description)
                     .foregroundStyle(.secondary)
             }
         }
-        .padding()
-        .navigationTitle("Hero Details")
+        .padding(.horizontal)
+        .scrollBounceBehavior(.basedOnSize)
+        .navigationTitle(hero.name)
     }
 }
 
-//#Preview {
-//    HeroDetailView()
-//}
+#Preview {
+    HeroDetailView(hero: .example)
+}
