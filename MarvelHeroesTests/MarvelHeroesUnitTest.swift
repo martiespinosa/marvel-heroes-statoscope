@@ -39,11 +39,13 @@ final class MarvelHeroesUnitTest: XCTestCase {
             },
             dateProvider: SystemProvider {
                 Date(timeIntervalSince1970: 0)
-            }
+            },
+            limit: 20,
+            offset: 0
         )
         XCTAssertEqual(result, [])
         XCTAssertEqual(
-            URLRequest(url: URL(string: "https://gateway.marvel.com/v1/public/characters?ts=0&apikey=bf569e30e03535d508b3ab5d4414e6ad&hash=f80250e4917dd35ddaab91744322993a")!),
+            URLRequest(url: URL(string: "https://gateway.marvel.com/v1/public/characters?limit=20&offset=0&ts=0&apikey=bf569e30e03535d508b3ab5d4414e6ad&hash=f80250e4917dd35ddaab91744322993a")!),
             request
         )
     }
@@ -60,10 +62,31 @@ final class MarvelHeroesUnitTest: XCTestCase {
         .THEN(\.characters, equals: [])
         .THEN_EnquedEffect(
             NetworkEffect(
-                request: URLRequest(url: URL(string: "https://gateway.marvel.com/v1/public/characters?ts=0&apikey=bf569e30e03535d508b3ab5d4414e6ad&hash=f80250e4917dd35ddaab91744322993a")!)
+                request: URLRequest(url: URL(string: "https://gateway.marvel.com/v1/public/characters?limit=20&offset=0&ts=0&apikey=bf569e30e03535d508b3ab5d4414e6ad&hash=f80250e4917dd35ddaab91744322993a")!)
             )
         )
-        .WHEN(.fetchCharactersCompleted(Self.emptyResponseMock.data(using: .utf8)!))
+        .FORK(
+            .fetchCharactersCompleted(
+                .failure(
+                    URLError(.notConnectedToInternet)
+                ),
+                page: 0
+            )
+        ) { sut in
+            try sut
+                .THEN(\.isLoading, equals: false)
+                .THEN(\.characters, equals: [])
+                .THEN(\.errorMessage,
+                       equals: "The operation couldn’t be completed. (NSURLErrorDomain error -1009.)")
+        }
+        .WHEN(
+            .fetchCharactersCompleted(
+                .success(
+                    Self.emptyResponseMock.data(using: .utf8)!
+                ),
+                page: 0
+            )
+        )
         .THEN(\.isLoading, equals: false)
         .THEN(\.characters, equals: [])
         .runTest()
