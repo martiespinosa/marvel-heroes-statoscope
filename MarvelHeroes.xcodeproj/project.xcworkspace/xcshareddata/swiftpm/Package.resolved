@@ -6,8 +6,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/InQBarna/statoscope.git",
       "state" : {
-        "revision" : "3422e15327bb2ab5e02a04d8245d1b9e3479486c",
-        "version" : "0.1.2"
+        "branch" : "main",
+        "revision" : "2398dad0119d2571edab004ce4e61e3416f2a7ac"
       }
     },
     {

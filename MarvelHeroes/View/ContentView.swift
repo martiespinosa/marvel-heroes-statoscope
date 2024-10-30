@@ -11,16 +11,8 @@ import SwiftUI
 struct ContentView: View {
     
     @EnvironmentObject var vm: ViewModel
-    @State private var searchText = ""
-    
-    private var filteredCharacters: [MarvelCharacterVM] {
-        if searchText.isEmpty {
-            return vm.characters
-        } else {
-            return vm.characters.filter { $0.name.localizedCaseInsensitiveContains(searchText) }
-        }
-    }
-    
+//    @State private var searchText = ""
+        
     var body: some View {
         NavigationStack {
             Group {
@@ -28,16 +20,16 @@ struct ContentView: View {
                     ProgressView("Fetching Heroes…")    
                 } else {
                     List {
-                        ForEach(filteredCharacters) { character in
+                        ForEach(vm.characters) { character in
                             NavigationLink {
                                 HeroDetailView(hero: character)
                             } label: {
                                 HeroView(hero: character)
                             }
                             .onAppear {
-                                let lastIndexMinusTen = vm.characters.count - 10
-                                if lastIndexMinusTen >= 0 && character == vm.characters[lastIndexMinusTen] {
-                                    vm.send(.userScrollToBottom)
+//                                let lastIndexMinusTen = vm.characters.count - 10
+                                if !vm.isSearching && character == vm.characters.last {
+                                    vm.send(.userScrolledToLastVisibleCell)
                                 }
                             }
                         }
@@ -50,7 +42,26 @@ struct ContentView: View {
                     }
                 }
             }
-            .searchable(text: $searchText)
+            .searchable(text: vm.bind(\.searchText, { ContentView.ViewModel.When.searchCharacters($0) }))
+//            .onChange(of: vm.searchText) { _, newText in
+//                if newText.isEmpty {
+//                    vm.isSearching = false
+//                    vm.send(.fetchCharacters)
+//                } else {
+//                    print("Buscando con texto: \(newText)")
+//                    vm.isSearching = true
+//                    try? vm.update(.searchCharacters(newText))
+//                }
+//            }
+//            .onChange(of: vm.searchText) { oldValue, newText in
+//                guard newText != oldValue else { return }
+//                
+//                if newText.isEmpty {
+//                    try? vm.update(.fetchCharacters)
+//                } else {
+//                    try? vm.update(.searchCharacters(newText))
+//                }
+//            }
             .alert("Error", isPresented: .constant(vm.isShowingError), actions: {
                 Button("OK") {
                     vm.send(.userTapOnErrorAlert)
