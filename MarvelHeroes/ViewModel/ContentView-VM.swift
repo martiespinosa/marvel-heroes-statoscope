@@ -11,7 +11,7 @@ import Statoscope
 import SwiftUI
 
 struct MarvelCharacterVM: Equatable, Identifiable {
-    var id: String { name }
+    var id = UUID()
     
     let name: String
     let imageURL: URL
@@ -29,8 +29,8 @@ extension ContentView {
 
         @Published var characters: [MarvelCharacterVM] = []
 //        @Published var searchedCharacters: [MarvelCharacterVM] = []
-//        @Published var isSearching = false
-        @Published var searchText: String = ""
+
+        @Published var searchText = ""
         var isSearching: Bool { !searchText.isEmpty }
         
         @Published var errorMessage: String?
@@ -141,7 +141,6 @@ extension ContentView {
                             description: $0.description ?? ""
                         )
                     }
-                    print(searchText)
                     characters.append(contentsOf: newCharacters)
                     allCharactersLoaded = newCharacters.isEmpty
                 } catch {
@@ -158,17 +157,9 @@ extension ContentView {
         }
         
         private func fetchCharactersByName(_ name: String) throws {
-//            guard !name.isEmpty else {
-//                errorMessage = "El nombre no puede estar vacío."
-//                isLoading = false
-//                return
-//            }
-            
             characters = []
-            print("Iniciando búsqueda para el nombre:", name)
             
             isLoading = true
-//            isSearching = true
             currentPage = 0
             let limit = pageSize
             let offset = currentPage * limit
@@ -183,8 +174,7 @@ extension ContentView {
             effectsState.enqueue(
                 NetworkEffect(request: req)
                     .map { result in
-                        print("Recibido resultado de búsqueda:", result)
-                        return When.fetchCharactersCompleted(result, page: self.currentPage)
+                        When.fetchCharactersCompleted(result, page: self.currentPage)
                     }
             )
         }

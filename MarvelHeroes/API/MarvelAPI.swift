@@ -94,7 +94,7 @@ class MarvelAPI {
     }
     
     static func parseMarvelCharactersResponse(data: Data) throws -> [MarvelCharacter] {
-        print("Datos recibidos:", String(data: data, encoding: .utf8) ?? "Datos vacíos")
+//        print("Datos recibidos:", String(data: data, encoding: .utf8) ?? "Datos vacíos")
         let decoder = JSONDecoder()
         let marvelResponse = try decoder.decode(MarvelResponse.self, from: data)
         return marvelResponse.data.results

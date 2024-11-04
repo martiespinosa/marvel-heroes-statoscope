@@ -42,26 +42,16 @@ struct ContentView: View {
                     }
                 }
             }
-            .searchable(text: vm.bind(\.searchText, { ContentView.ViewModel.When.searchCharacters($0) }))
-//            .onChange(of: vm.searchText) { _, newText in
-//                if newText.isEmpty {
-//                    vm.isSearching = false
-//                    vm.send(.fetchCharacters)
-//                } else {
-//                    print("Buscando con texto: \(newText)")
-//                    vm.isSearching = true
-//                    try? vm.update(.searchCharacters(newText))
-//                }
-//            }
-//            .onChange(of: vm.searchText) { oldValue, newText in
-//                guard newText != oldValue else { return }
-//                
-//                if newText.isEmpty {
-//                    try? vm.update(.fetchCharacters)
-//                } else {
-//                    try? vm.update(.searchCharacters(newText))
-//                }
-//            }
+//            .searchable(text: vm.bind(\.searchText, { ContentView.ViewModel.When.searchCharacters($0) }))
+            .searchable(text: $vm.searchText)
+            .onChange(of: vm.searchText) { _, newValue in
+                if newValue.isEmpty {
+                    vm.characters.removeAll()
+                    vm.send(.fetchCharacters)
+                } else {
+                    vm.send(.searchCharacters(newValue))
+                }
+            }
             .alert("Error", isPresented: .constant(vm.isShowingError), actions: {
                 Button("OK") {
                     vm.send(.userTapOnErrorAlert)
@@ -72,7 +62,7 @@ struct ContentView: View {
             .navigationTitle("Marvel Heroes")
         }
         .onAppear {
-            StatoscopeLogger.logLevel = [.errors, .when, .effects, /*.stateDiff,*/ .injection]
+//            StatoscopeLogger.logLevel = [.errors, .when, .effects, /*.stateDiff,*/ .injection]
             vm.send(.fetchCharacters)
         }
     }
