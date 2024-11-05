@@ -12,7 +12,7 @@ import StatoscopeTesting
 
 final class MarvelHeroesUnitTest: XCTestCase {
     
-    static var emptyResponseMock =
+    static let emptyResponseMock =
     """
     {
         "code": 0,
@@ -31,7 +31,7 @@ final class MarvelHeroesUnitTest: XCTestCase {
     }
     """
 
-    static var pageZeroResponseMock =
+    static let pageZeroResponseMock =
     """
     {
         "code": 0,
@@ -51,8 +51,22 @@ final class MarvelHeroesUnitTest: XCTestCase {
         }
     }
     """
+    static let expectedCharactersPageZero: [MarvelCharacterVM] = [
+        MarvelCharacterVM(
+            id: 1011334,
+            name: "3-D Man",
+            imageURL: URL(string: "https://i.annihil.us/u/prod/marvel/i/mg/c/e0/535fecbbb9784.jpg")!,
+            description: ""
+        ),
+        MarvelCharacterVM(
+            id: 1017100,
+            name: "A-Bomb (HAS)",
+            imageURL: URL(string: "https://i.annihil.us/u/prod/marvel/i/mg/3/20/5232158de5b16.jpg")!,
+            description: "Rick Jones has been Hulk's best bud since day one, but now he's more than a friend...he's a teammate! Transformed by a Gamma energy explosion, A-Bomb's thick, armored skin is just as strong and powerful as it is blue. And when he curls into action, he uses it like a giant bowling ball of destruction! "
+        )
+    ]
 
-    static var pageOneResponseMock =
+    static let pageOneResponseMock =
     """
     {
         "code": 0,
@@ -72,8 +86,16 @@ final class MarvelHeroesUnitTest: XCTestCase {
         }
     }
     """
+    static let expectedCharactersPageOne: [MarvelCharacterVM] = [
+        MarvelCharacterVM(
+            id: 1009144,
+            name: "A.I.M.",
+            imageURL: URL(string: "https://i.annihil.us/u/prod/marvel/i/mg/6/20/52602f21f29ec.jpg")!,
+            description: "AIM is a terrorist organization bent on destroying the world."
+        )
+    ]
     
-    func testFetchMarvelCharacters() async throws {
+    func testFetchMarvelCharactersEmpty() async throws {
         var request: URLRequest?
         let result = try await MarvelAPI.fetchMarvelCharacters(
             provider: NetworkProvider { requested in
@@ -89,6 +111,46 @@ final class MarvelHeroesUnitTest: XCTestCase {
         XCTAssertEqual(result, [])
         XCTAssertEqual(
             URLRequest(url: URL(string: "https://gateway.marvel.com/v1/public/characters?limit=20&offset=0&ts=0&apikey=bf569e30e03535d508b3ab5d4414e6ad&hash=f80250e4917dd35ddaab91744322993a")!),
+            request
+        )
+    }
+    
+    func testFetchMarvelCharactersPageZero() async throws {
+        var request: URLRequest?
+        let result = try await MarvelAPI.fetchMarvelCharacters(
+            provider: NetworkProvider { requested in
+                request = requested
+                return Self.pageZeroResponseMock.data(using: .utf8)!
+            },
+            dateProvider: SystemProvider {
+                Date(timeIntervalSince1970: 0)
+            },
+            limit: 2,
+            offset: 0
+        )
+        XCTAssertEqual(result.count, 2)
+        XCTAssertEqual(
+            URLRequest(url: URL(string: "https://gateway.marvel.com/v1/public/characters?limit=2&offset=0&ts=0&apikey=bf569e30e03535d508b3ab5d4414e6ad&hash=f80250e4917dd35ddaab91744322993a")!),
+            request
+        )
+    }
+    
+    func testFetchMarvelCharactersPageOne() async throws {
+        var request: URLRequest?
+        let result = try await MarvelAPI.fetchMarvelCharacters(
+            provider: NetworkProvider { requested in
+                request = requested
+                return Self.pageOneResponseMock.data(using: .utf8)!
+            },
+            dateProvider: SystemProvider {
+                Date(timeIntervalSince1970: 0)
+            },
+            limit: 2,
+            offset: 0
+        )
+        XCTAssertEqual(result.count, 1)
+        XCTAssertEqual(
+            URLRequest(url: URL(string: "https://gateway.marvel.com/v1/public/characters?limit=2&offset=0&ts=0&apikey=bf569e30e03535d508b3ab5d4414e6ad&hash=f80250e4917dd35ddaab91744322993a")!),
             request
         )
     }
@@ -147,13 +209,13 @@ final class MarvelHeroesUnitTest: XCTestCase {
             )
         )
         .THEN(\.isLoading, equals: false)
-        .THEN(\.characters, equals: [])
+        .THEN(\.characters, equals: Self.expectedCharactersPageZero)
         .THEN(\.searchText, equals: "")
         .THEN(\.errorMessage, equals: nil)
         .THEN(\.isBottomLoading, equals: false)
         .WHEN(.userScrolledToLastVisibleCell)
         .THEN(\.isLoading, equals: false)
-        .THEN(\.characters, equals: []) // TODO: posar els characters del mock pagina 0
+        .THEN(\.characters, equals: Self.expectedCharactersPageZero)
         .THEN(\.searchText, equals: "")
         .THEN(\.errorMessage, equals: nil)
         .THEN(\.isBottomLoading, equals: true)
@@ -171,7 +233,7 @@ final class MarvelHeroesUnitTest: XCTestCase {
             )
         )
         .THEN(\.isLoading, equals: false)
-        .THEN(\.characters, equals: []) // TODO: posar els characters de la pagina 0 i 1
+        .THEN(\.characters, equals: Self.expectedCharactersPageZero + Self.expectedCharactersPageOne)
         .THEN(\.searchText, equals: "")
         .THEN(\.errorMessage, equals: nil)
         .THEN(\.isBottomLoading, equals: false)

@@ -11,17 +11,24 @@ import Statoscope
 import SwiftUI
 
 struct MarvelCharacterVM: Equatable, Identifiable {
-    var id = UUID()
-    
+    var id: Int
     let name: String
     let imageURL: URL
     let description: String
     
     static let example: Self = .init(
+        id: 1017100,
         name: "A-Bomb (HAS)",
         imageURL: URL(string: "https://i.annihil.us/u/prod/marvel/i/mg/3/20/5232158de5b16.jpg")!,
         description: "Rick Jones has been Hulk's best bud since day one, but now he's more than a friend...he's a teammate! Transformed by a Gamma energy explosion, A-Bomb's thick, armored skin is just as strong and powerful as it is blue. And when he curls into action, he uses it like a giant bowling ball of destruction!"
     )
+    
+    init(id: Int, name: String, imageURL: URL, description: String) {
+        self.id = id
+        self.name = name
+        self.imageURL = imageURL
+        self.description = description
+    }
 }
 
 extension ContentView {
@@ -44,19 +51,7 @@ extension ContentView {
         private var allCharactersLoaded = false
         
         @Injected var systemProvider: SystemProvider
-        
-//        init(characters: [MarvelCharacterVM], searchText: String, errorMessage: String? = nil, isLoading: Bool = false, isBottomLoading: Bool = false, currentPage: Int = 0, pageSize: Int = 20, allCharactersLoaded: Bool = false, systemProvider: SystemProvider) {
-//            self.characters = characters
-//            self.searchText = searchText
-//            self.errorMessage = errorMessage
-//            self.isLoading = isLoading
-//            self.isBottomLoading = isBottomLoading
-//            self.currentPage = currentPage
-//            self.pageSize = pageSize
-//            self.allCharactersLoaded = allCharactersLoaded
-//            self.systemProvider = systemProvider
-//        }
-        
+                
         enum When {
             case fetchCharacters
             case fetchCharactersCompleted(Result<Data, Error>, page: Int)
@@ -73,6 +68,7 @@ extension ContentView {
                 try fetchCharactersCompleted(response, page: page)
             case .userTapOnErrorAlert:
                 errorMessage = nil
+                try fetchCharacters()
             case .userScrolledToLastVisibleCell:
                 if !isLoading && !allCharactersLoaded {
                     try fetchMoreCharacters()
@@ -136,6 +132,7 @@ extension ContentView {
                     let response = try MarvelAPI.parseMarvelCharactersResponse(data: data)
                     let newCharacters = response.map {
                         MarvelCharacterVM(
+                            id: $0.id,
                             name: $0.name,
                             imageURL: $0.thumbnail.url,
                             description: $0.description ?? ""
