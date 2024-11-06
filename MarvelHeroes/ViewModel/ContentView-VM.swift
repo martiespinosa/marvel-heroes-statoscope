@@ -71,7 +71,11 @@ extension ContentView {
                 try fetchCharacters(page: currentPage)
             case .userScrolledToLastVisibleCell:
                 if !isLoading && !isBottomLoading && !allCharactersLoaded {
-                    try fetchCharacters(page: currentPage + 1)
+                    if searchText.count == 0 {
+                        try fetchCharacters(page: currentPage + 1)
+                    } else {
+                        try fetchCharactersByName(page: currentPage + 1, searchText)
+                    }
                 }
             case .searchCharacters(let name):
                 // Debounce
@@ -99,6 +103,7 @@ extension ContentView {
                 limit: limit,
                 offset: offset,
                 dateProvider: systemProvider
+
             )
             
             effectsState.enqueue(
@@ -137,9 +142,14 @@ extension ContentView {
         }
         
         private func fetchCharactersByName(page: Int, _ name: String) throws {
-            characters = []
-            
-            isLoading = true
+            if page == 0 {
+                characters = []
+                isLoading = true
+                isBottomLoading = false
+            } else {
+                isLoading = false
+                isBottomLoading = true
+            }
             currentPage = page
             let limit = pageSize
             let offset = currentPage * limit
