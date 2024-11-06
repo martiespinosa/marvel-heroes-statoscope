@@ -38,7 +38,6 @@ extension ContentView {
 //        @Published var searchedCharacters: [MarvelCharacterVM] = []
 
         @Published var searchText = ""
-        var isSearching: Bool { !searchText.isEmpty }
         
         @Published var errorMessage: String?
         @Published var isLoading = false
@@ -49,12 +48,13 @@ extension ContentView {
         private var currentPage = 0
         var pageSize = 20
         private var allCharactersLoaded = false
+        static private var minimumCharactersForSearch = 3
         
         @Injected var systemProvider: SystemProvider
                 
         enum When {
             case fetchCharacters
-            case fetchCharactersCompleted(Result<Data, Error>, page: Int)
+            case fetchCharactersCompleted(Result<Data, Error>, page: Int, searchTerm: String?)
             case userTapOnErrorAlert
             case userScrolledToLastVisibleCell
             case searchCharacters(String)
@@ -63,31 +63,35 @@ extension ContentView {
         func update(_ when: When) throws {
             switch when {
             case .fetchCharacters:
-                try fetchCharacters()
-            case .fetchCharactersCompleted(let response, let page):
-                try fetchCharactersCompleted(response, page: page)
+                try fetchCharacters(page: 0)
+            case .fetchCharactersCompleted(let response, let page, let searchTerm):
+                try fetchCharactersCompleted(response, page: page, searchTerm: searchTerm)
             case .userTapOnErrorAlert:
                 errorMessage = nil
-                try fetchCharacters()
+                try fetchCharacters(page: currentPage)
             case .userScrolledToLastVisibleCell:
-                if !isLoading && !allCharactersLoaded {
-                    try fetchMoreCharacters()
+                if !isLoading && !isBottomLoading && !allCharactersLoaded {
+                    try fetchCharacters(page: currentPage + 1)
                 }
             case .searchCharacters(let name):
-                print("Buscando personajes con el nombre:", name)
-                do {
-                    if !name.isEmpty {
-                        try fetchCharactersByName(name)
-                    }
-                } catch {
-                    print("Error al buscar personajes: \(error.localizedDescription)")
+                // Debounce
+                self.searchText = name
+                if name.count >= Self.minimumCharactersForSearch {
+                    effectsState.cancelAllEffects()
+                    try fetchCharactersByName(page: 0, name)
                 }
             }
         }
         
-        private func fetchCharacters() throws {
-            isLoading = true
-            currentPage = 0
+        private func fetchCharacters(page: Int) throws {
+            if page == 0 {
+                isLoading = true
+                isBottomLoading = false
+            } else {
+                isLoading = false
+                isBottomLoading = true
+            }
+            currentPage = page
             let limit = pageSize
             let offset = currentPage * limit
             
@@ -100,64 +104,43 @@ extension ContentView {
             effectsState.enqueue(
                 NetworkEffect(request: req)
                     .map { result in
-                        When.fetchCharactersCompleted(result, page: self.currentPage)
+                        When.fetchCharactersCompleted(result, page: page, searchTerm: nil)
                     }
             )
         }
         
-        private func fetchMoreCharacters() throws {
-            isBottomLoading = true
-            currentPage += 1
-            let limit = pageSize
-            let offset = currentPage * limit
+        private func fetchCharactersCompleted(_ result: Result<Data, Error>, page: Int, searchTerm: String?) throws {
+            guard self.searchText == (searchTerm ?? ""),
+                  self.currentPage == page else {
+                return
+            }
             
-            let req = try MarvelAPI.fetchMarvelCharactersRequest(
-                limit: limit,
-                offset: offset,
-                dateProvider: systemProvider
-            )
-            
-            effectsState.enqueue(
-                NetworkEffect(request: req)
-                    .map { result in
-                        When.fetchCharactersCompleted(result, page: self.currentPage)
-                    }
-            )
-        }
-        
-        private func fetchCharactersCompleted(_ result: Result<Data, Error>, page: Int) throws {
             switch result {
             case .success(let data):
-                do {
-                    let response = try MarvelAPI.parseMarvelCharactersResponse(data: data)
-                    let newCharacters = response.map {
-                        MarvelCharacterVM(
-                            id: $0.id,
-                            name: $0.name,
-                            imageURL: $0.thumbnail.url,
-                            description: $0.description ?? ""
-                        )
-                    }
-                    characters.append(contentsOf: newCharacters)
-                    allCharactersLoaded = newCharacters.isEmpty
-                } catch {
-                    errorMessage = "Error al analizar los datos"
+                let response = try MarvelAPI.parseMarvelCharactersResponse(data: data)
+                let newCharacters = response.map {
+                    MarvelCharacterVM(
+                        id: $0.id,
+                        name: $0.name,
+                        imageURL: $0.thumbnail.url,
+                        description: $0.description ?? ""
+                    )
                 }
-                
+                characters.append(contentsOf: newCharacters)
+                allCharactersLoaded = newCharacters.isEmpty
             case .failure(let error):
                 errorMessage = "Fallo en la solicitud"
                 print(error.localizedDescription)
             }
-            
             isLoading = false
             isBottomLoading = false
         }
         
-        private func fetchCharactersByName(_ name: String) throws {
+        private func fetchCharactersByName(page: Int, _ name: String) throws {
             characters = []
             
             isLoading = true
-            currentPage = 0
+            currentPage = page
             let limit = pageSize
             let offset = currentPage * limit
             
@@ -171,7 +154,7 @@ extension ContentView {
             effectsState.enqueue(
                 NetworkEffect(request: req)
                     .map { result in
-                        When.fetchCharactersCompleted(result, page: self.currentPage)
+                        When.fetchCharactersCompleted(result, page: page, searchTerm: name)
                     }
             )
         }

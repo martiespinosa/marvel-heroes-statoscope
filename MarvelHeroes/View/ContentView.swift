@@ -28,7 +28,7 @@ struct ContentView: View {
                             }
                             .onAppear {
 //                                let lastIndexMinusTen = vm.characters.count - 10
-                                if !vm.isSearching && character == vm.characters.last {
+                                if character == vm.characters.last {
                                     vm.send(.userScrolledToLastVisibleCell)
                                 }
                             }
