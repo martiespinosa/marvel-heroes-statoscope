@@ -8,7 +8,7 @@
 import Statoscope
 import SwiftUI
 
-struct ContentView: View {
+struct HeroesListView: View {
     
     @EnvironmentObject var vm: ViewModel
 //    @State private var searchText = ""
@@ -23,11 +23,14 @@ struct ContentView: View {
                         ForEach(vm.characters) { character in
                             NavigationLink {
                                 HeroDetailView(hero: character)
+                                    .environmentObject(HeroDetailView.ViewModel()
+                                        .injectObject(Providers.defaultNetworkProvider)
+                                        .injectObject(Providers.defaultSystemProvider)
+                                    )
                             } label: {
-                                HeroView(hero: character)
+                                HeroRowView(hero: character)
                             }
                             .onAppear {
-//                                let lastIndexMinusTen = vm.characters.count - 10
                                 if character == vm.characters.last {
                                     vm.send(.userScrolledToLastVisibleCell)
                                 }
@@ -69,23 +72,23 @@ struct ContentView: View {
 }
 
 #Preview {
-    ContentView()
-        .environmentObject(ContentView.ViewModel()
+    HeroesListView()
+        .environmentObject(HeroesListView.ViewModel()
             .injectObject(Providers.defaultNetworkProvider)
             .injectObject(Providers.defaultSystemProvider))
 }
 
 #Preview {
-    ContentView()
-        .environmentObject(ContentView.ViewModel()
+    HeroesListView()
+        .environmentObject(HeroesListView.ViewModel()
             .set(\.errorMessage, "Ha habido un error")
             .injectObject(Providers.defaultNetworkProvider)
             .injectObject(Providers.defaultSystemProvider))
 }
 
 #Preview {
-    ContentView()
-        .environmentObject(ContentView.ViewModel()
+    HeroesListView()
+        .environmentObject(HeroesListView.ViewModel()
             .set(\.isBottomLoading, true)
             .set(\.characters, [.example])
             .injectObject(Providers.defaultNetworkProvider)

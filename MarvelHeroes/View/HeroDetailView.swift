@@ -5,11 +5,14 @@
 //  Created by Martí Espinosa Farran on 21/10/24.
 //
 
+import Statoscope
 import SwiftUI
 
 struct HeroDetailView: View {
     
     let hero: MarvelCharacterVM
+    
+    @EnvironmentObject var vm: ViewModel
     
     var body: some View {
         ScrollView {
@@ -27,7 +30,18 @@ struct HeroDetailView: View {
                 
                 Text(hero.description)
                     .foregroundStyle(.secondary)
+                
+                if vm.isLoading {
+                    ProgressView()
+                } else {
+                    ForEach(vm.comics) { comic in
+                        Text(comic.title)
+                    }
+                }
             }
+        }
+        .onAppear {
+            vm.send(.fetchComics(heroId: hero.id))
         }
         .padding(.horizontal)
         .scrollBounceBehavior(.basedOnSize)

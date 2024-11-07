@@ -7,7 +7,7 @@
 
 import SwiftUI
 
-struct HeroView: View {
+struct HeroRowView: View {
     
     let hero: MarvelCharacterVM
     
@@ -36,5 +36,5 @@ struct HeroView: View {
 }
 
 #Preview {
-    HeroView(hero: .example)
+    HeroRowView(hero: .example)
 }

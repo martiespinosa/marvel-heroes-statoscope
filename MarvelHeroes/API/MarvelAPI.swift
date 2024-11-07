@@ -94,9 +94,44 @@ class MarvelAPI {
     }
     
     static func parseMarvelCharactersResponse(data: Data) throws -> [MarvelCharacter] {
-//        print("Datos recibidos:", String(data: data, encoding: .utf8) ?? "Datos vacíos")
         let decoder = JSONDecoder()
-        let marvelResponse = try decoder.decode(MarvelResponse.self, from: data)
+        let marvelResponse = try decoder.decode(MarvelResponse<MarvelCharacter>.self, from: data)
+        return marvelResponse.data.results
+    }
+    
+    static func fetchMarvelComicsByHeroId(
+        provider: NetworkProvider,
+        dateProvider: SystemProvider,
+        heroId: Int
+    ) async throws -> [MarvelComic] {
+        let request = try fetchMarvelComicsByHeroIdRequest(heroId: heroId, dateProvider: dateProvider)
+        return try parseMarvelComicsResponse(
+            data: try await provider.fetchData(request)
+        )
+    }
+    
+    static func fetchMarvelComicsByHeroIdRequest(
+        heroId: Int,
+        dateProvider: SystemProvider
+    ) throws -> URLRequest {
+        let publicKey = MarvelAPIKeys.publicKey
+        let privateKey = MarvelAPIKeys.privateKey
+        let timestamp = String(Int(dateProvider.date().timeIntervalSince1970))
+        
+        let hash = (timestamp + privateKey + publicKey).data(using: .utf8)!.md5()
+        
+        let urlString = "https://gateway.marvel.com/v1/public/characters/\(heroId)/comics?ts=\(timestamp)&apikey=\(publicKey)&hash=\(hash)"
+        
+        guard let url = URL(string: urlString) else {
+            throw URLError(.badURL)
+        }
+        print("fetching marvel comics")
+        return URLRequest(url: url)
+    }
+    
+    static func parseMarvelComicsResponse(data: Data) throws -> [MarvelComic] {
+        let decoder = JSONDecoder()
+        let marvelResponse = try decoder.decode(MarvelResponse<MarvelComic>.self, from: data)
         return marvelResponse.data.results
     }
 }

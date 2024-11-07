@@ -11,10 +11,11 @@ import SwiftUI
 struct MarvelHeroesApp: App {
     var body: some Scene {
         WindowGroup {
-            ContentView()
-                .environmentObject(ContentView.ViewModel()
+            HeroesListView()
+                .environmentObject(HeroesListView.ViewModel()
                     .injectObject(Providers.defaultNetworkProvider)
-                    .injectObject(Providers.defaultSystemProvider))
+                    .injectObject(Providers.defaultSystemProvider)
+                )
         }
     }
 }

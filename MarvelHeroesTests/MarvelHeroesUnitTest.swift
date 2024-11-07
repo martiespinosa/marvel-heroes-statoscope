@@ -309,8 +309,8 @@ final class MarvelHeroesUnitTest: XCTestCase {
     }
     
     func testListFlow() throws {
-        try ContentView.ViewModel.GIVEN {
-            ContentView.ViewModel()
+        try HeroesListView.ViewModel.GIVEN {
+            HeroesListView.ViewModel()
                 .injectObject(SystemProvider(date: {
                     Date(timeIntervalSince1970: 0)
                 }))
@@ -397,8 +397,8 @@ final class MarvelHeroesUnitTest: XCTestCase {
     }
     
     func testSearchFlow() throws {
-        try ContentView.ViewModel.GIVEN {
-            ContentView.ViewModel()
+        try HeroesListView.ViewModel.GIVEN {
+            HeroesListView.ViewModel()
                 .injectObject(SystemProvider(date: {
                     Date(timeIntervalSince1970: 0)
                 }))

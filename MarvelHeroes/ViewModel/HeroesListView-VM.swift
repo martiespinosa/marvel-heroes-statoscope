@@ -31,7 +31,7 @@ struct MarvelCharacterVM: Equatable, Identifiable {
     }
 }
 
-extension ContentView {
+extension HeroesListView {
     final class ViewModel: Statostore, ObservableObject {
 
         @Published var characters: [MarvelCharacterVM] = []
