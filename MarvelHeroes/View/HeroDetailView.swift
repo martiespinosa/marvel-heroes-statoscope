@@ -31,11 +31,17 @@ struct HeroDetailView: View {
                 Text(hero.description)
                     .foregroundStyle(.secondary)
                 
-                if vm.isLoading {
-                    ProgressView()
-                } else {
-                    ForEach(vm.comics) { comic in
-                        Text(comic.title)
+                VStack(alignment: .leading) {
+                    Text("Comics")
+                        .font(.title2)
+                        .fontWeight(.semibold)
+                    
+                    if vm.isLoading {
+                        ProgressView()
+                    } else {
+                        ForEach(vm.comics) { comic in
+                            ComicView(comic: comic)
+                        }
                     }
                 }
             }
@@ -51,4 +57,7 @@ struct HeroDetailView: View {
 
 #Preview {
     HeroDetailView(hero: .example)
+        .environmentObject(HeroDetailView.ViewModel()
+            .injectObject(Providers.defaultNetworkProvider)
+            .injectObject(Providers.defaultSystemProvider))
 }

@@ -70,6 +70,11 @@ extension HeroDetailView {
         }
         
         private func fetchComicsCompleted(_ result: Result<Data, Error>) throws {
+            guard comics.isEmpty else {
+                isLoading = false
+                return
+            }
+            
             switch result {
             case .success(let data):
                 let response = try MarvelAPI.parseMarvelComicsResponse(data: data)
