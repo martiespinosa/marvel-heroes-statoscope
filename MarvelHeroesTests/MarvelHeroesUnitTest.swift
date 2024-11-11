@@ -309,8 +309,8 @@ final class MarvelHeroesUnitTest: XCTestCase {
     }
     
     func testListFlow() throws {
-        try HeroesListView.ViewModel.GIVEN {
-            HeroesListView.ViewModel()
+        try HeroesListView.HeroesListVM.GIVEN {
+            HeroesListView.HeroesListVM()
                 .injectObject(SystemProvider(date: {
                     Date(timeIntervalSince1970: 0)
                 }))
@@ -397,8 +397,8 @@ final class MarvelHeroesUnitTest: XCTestCase {
     }
     
     func testSearchFlow() throws {
-        try HeroesListView.ViewModel.GIVEN {
-            HeroesListView.ViewModel()
+        try HeroesListView.HeroesListVM.GIVEN {
+            HeroesListView.HeroesListVM()
                 .injectObject(SystemProvider(date: {
                     Date(timeIntervalSince1970: 0)
                 }))
@@ -439,5 +439,80 @@ final class MarvelHeroesUnitTest: XCTestCase {
         .THEN(\.errorMessage, equals: nil)
         .THEN(\.isBottomLoading, equals: false)
         .runTest()
+    }
+    
+    
+    
+    
+    
+    // Detail View Test
+    static let comicsResponseMock =
+    """
+    {
+    "code": 200,
+    "status": "Ok",
+    "data": {
+    "results": [
+      {
+        "id": 47176,
+        "title": "FREE COMIC BOOK DAY 2013 1 (2013) #1",
+        "thumbnail": {
+          "path": "http://i.annihil.us/u/prod/marvel/i/mg/9/50/57ed5bc9040e3",
+          "extension": "jpg"
+        },
+        "description": ""
+      },
+      {
+        "id": 40628,
+        "title": "Hulk (2008) #55",
+        "thumbnail": {
+          "path": "http://i.annihil.us/u/prod/marvel/i/mg/6/60/5ba3d0869c543",
+          "extension": "jpg"
+        },
+        "description": "The hands of the doomsday clock race towards MAYAN RULE! Former Avengers arrive to help stop the end of the world as more Mayan gods return. Rick \"A-Bomb\" Jones falls in battle!"
+      }
+    ]
+    }
+    }
+    """
+    static let expectedComics: [MarvelComicVM] = [
+        MarvelComicVM(
+            id: 47176,
+            title: "FREE COMIC BOOK DAY 2013 1 (2013) #1",
+            imageURL: URL(string: "https://i.annihil.us/u/prod/marvel/i/mg/9/50/57ed5bc9040e3.jpg")!,
+            description: ""
+        ),
+        MarvelComicVM(
+            id: 40628,
+            title: "Hulk (2008) #55",
+            imageURL: URL(string: "https://i.annihil.us/u/prod/marvel/i/mg/6/60/5ba3d0869c543.jpg")!,
+            description: "The hands of the doomsday clock race towards MAYAN RULE! Former Avengers arrive to help stop the end of the world as more Mayan gods return. Rick \"A-Bomb\" Jones falls in battle!"
+        )
+    ]
+    
+    func testComicsFlow() throws {
+        try HeroDetailView.HeroDetailVM.GIVEN {
+            HeroDetailView.HeroDetailVM(character: .example)
+                .injectObject(SystemProvider(date: {
+                    Date(timeIntervalSince1970: 0)
+                }))
+        }
+        .WHEN(.fetchComics)
+        .THEN(\.isLoading, equals: true)
+        .THEN(\.comics, equals: [])
+        .THEN_EnquedEffect(
+            NetworkEffect(
+                request: URLRequest(url: URL(string: "https://gateway.marvel.com/v1/public/characters/1017100/comics?ts=1731327468&apikey=bf569e30e03535d508b3ab5d4414e6ad&hash=0faef49d9d704f221d7c717e93082f26")!)
+            )
+        )
+        .WHEN(
+            .fetchComicsCompleted(
+                .success(
+                    Self.pageZeroResponseMock.data(using: .utf8)!
+                )
+            )
+        )
+        .THEN(\.isLoading, equals: false)
+        .THEN(\.comics, equals: Self.expectedComics)
     }
 }
