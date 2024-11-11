@@ -10,14 +10,12 @@ import SwiftUI
 
 struct HeroDetailView: View {
     
-    let hero: MarvelCharacterVM
-    
-    @EnvironmentObject var vm: ViewModel
+    @ObservedObject var vm: HeroDetailVM
     
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 16) {
-                AsyncImage(url: hero.imageURL) { image in
+                AsyncImage(url: vm.character.imageURL) { image in
                     image
                         .resizable()
                         .scaledToFit()
@@ -28,7 +26,7 @@ struct HeroDetailView: View {
                 }
                 .frame(maxWidth: .infinity)
                 
-                Text(hero.description)
+                Text(vm.character.description)
                     .foregroundStyle(.secondary)
                 
                 VStack(alignment: .leading) {
@@ -47,17 +45,20 @@ struct HeroDetailView: View {
             }
         }
         .onAppear {
-            vm.send(.fetchComics(heroId: hero.id))
+            vm.send(.fetchComics)
         }
         .padding(.horizontal)
         .scrollBounceBehavior(.basedOnSize)
-        .navigationTitle(hero.name)
+        .navigationTitle(vm.character.name)
     }
 }
 
 #Preview {
-    HeroDetailView(hero: .example)
-        .environmentObject(HeroDetailView.ViewModel()
-            .injectObject(Providers.defaultNetworkProvider)
-            .injectObject(Providers.defaultSystemProvider))
+    HeroDetailView(
+        vm: HeroDetailView.HeroDetailVM(
+            character: .example
+        )
+        .injectObject(Providers.defaultNetworkProvider)
+        .injectObject(Providers.defaultSystemProvider)
+    )
 }

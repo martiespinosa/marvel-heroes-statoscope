@@ -32,10 +32,9 @@ struct MarvelCharacterVM: Equatable, Identifiable {
 }
 
 extension HeroesListView {
-    final class ViewModel: Statostore, ObservableObject {
+    final class HeroesListVM: Statostore, ObservableObject {
 
         @Published var characters: [MarvelCharacterVM] = []
-//        @Published var searchedCharacters: [MarvelCharacterVM] = []
 
         @Published var searchText = ""
         
@@ -51,6 +50,8 @@ extension HeroesListView {
         static private var minimumCharactersForSearch = 3
         
         @Injected var systemProvider: SystemProvider
+        
+        @Subscope var detail: HeroDetailView.HeroDetailVM?
                 
         enum When {
             case fetchCharacters
@@ -58,6 +59,7 @@ extension HeroesListView {
             case userTapOnErrorAlert
             case userScrolledToLastVisibleCell
             case searchCharacters(String)
+            case navigateToDetail(Int?)
         }
         
         func update(_ when: When) throws {
@@ -79,16 +81,39 @@ extension HeroesListView {
                 }
             case .searchCharacters(let name):
                 // Debounce
+                guard name != self.searchText else {
+                    return
+                }
+                
                 self.searchText = name
-                if name.count >= Self.minimumCharactersForSearch {
+                if name.isEmpty {
+                    try fetchCharacters(page: 0)
+                } else if name.count >= Self.minimumCharactersForSearch {
                     effectsState.cancelAllEffects()
                     try fetchCharactersByName(page: 0, name)
                 }
+            case .navigateToDetail(let id):
+                guard let id else {
+                    // self.detailId = nil
+                    self.detail = nil
+                    return
+                }
+                // guard self.detailId != id else {
+                guard self.detail?.character.id != id else {
+                    return
+                }
+                guard let character = self.characters.first(where: { $0.id == id }) else {
+                    throw InvalidStateError()
+                }
+                // self.detailId = id
+                self.detail = HeroDetailView.HeroDetailVM(character: character)
+                self.detail?.send(.fetchComics)
             }
         }
         
         private func fetchCharacters(page: Int) throws {
             if page == 0 {
+                characters.removeAll()
                 isLoading = true
                 isBottomLoading = false
             } else {
@@ -170,26 +195,3 @@ extension HeroesListView {
         }
     }
 }
-
-
-//    .WHEN(.fetchCharacters)
-//    .THEN(\.isLoading, equals: true)
-//    .THEN(\.characters, equals: [])
-//    .WHEN(.fetchCharactersCompleted(.success(Self.emptyResponseMock.data(using: .utf8)!)))
-//    .THEN(\.isLoading, equals: false)
-//    .THEN(\.characters, equals: [])
-//.runTest()
-
-
-//    .WHEN(.fetchCharacters)
-//    .THEN(\.isLoading, equals: true)
-//    .THEN(\.characters, equals: [])
-//    .WHEN(.fetchCharactersCompleted(.failure(error)))
-//    .THEN(\.isLoading, equals: false)
-//    .THEN(\.characters, equals: [])
-//    .THEN(\.errorMessage, equals: "Ha habido un error")
-//    .WHEN(.userTapsUnErrorAlert)
-//    .THEN(\.isLoading, equals: true)
-//    .THEN(\.characters, equals: [])
-//    .THEN(\.errorMessage, equals: nil)
-//.runTest()

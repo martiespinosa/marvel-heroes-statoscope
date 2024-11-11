@@ -32,32 +32,37 @@ struct MarvelComicVM: Equatable, Identifiable {
 }
 
 extension HeroDetailView {
-    final class ViewModel: Statostore, ObservableObject {
+    final class HeroDetailVM: Statostore, ObservableObject {
         
+        let character: MarvelCharacterVM
         @Published var comics: [MarvelComicVM] = []
         @Published var isLoading = false
         
         @Injected var systemProvider: SystemProvider
         
+        init(character: MarvelCharacterVM) {
+            self.character = character
+        }
+        
         enum When {
-            case fetchComics(heroId: Int)
+            case fetchComics
             case fetchComicsCompleted(Result<Data, Error>)
         }
         
         func update(_ when: When) throws {
             switch when {
-            case .fetchComics(let heroId):
-                try fetchComics(heroId: heroId)
+            case .fetchComics:
+                try fetchComics()
             case .fetchComicsCompleted(let response):
                 try fetchComicsCompleted(response)
             }
         }
         
-        private func fetchComics(heroId: Int) throws {
+        private func fetchComics() throws {
             isLoading = true
             
             let req = try MarvelAPI.fetchMarvelComicsByHeroIdRequest(
-                heroId: heroId,
+                heroId: character.id,
                 dateProvider: systemProvider
             )
             

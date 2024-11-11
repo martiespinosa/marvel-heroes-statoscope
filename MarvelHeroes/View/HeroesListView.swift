@@ -10,8 +10,7 @@ import SwiftUI
 
 struct HeroesListView: View {
     
-    @EnvironmentObject var vm: ViewModel
-//    @State private var searchText = ""
+    @ObservedObject var vm: HeroesListVM
         
     var body: some View {
         NavigationStack {
@@ -19,42 +18,34 @@ struct HeroesListView: View {
                 if vm.isLoading {
                     ProgressView("Fetching Heroes…")    
                 } else {
-                    List {
-                        ForEach(vm.characters) { character in
-                            NavigationLink {
-                                HeroDetailView(hero: character)
-                                    .environmentObject(HeroDetailView.ViewModel()
-                                        .injectObject(Providers.defaultNetworkProvider)
-                                        .injectObject(Providers.defaultSystemProvider)
-                                    )
-                            } label: {
-                                HeroRowView(hero: character)
-                            }
+                    let listSelectionBinding: Binding<Int?> = vm.bind(
+                       \.detail?.character.id,
+                        HeroesListView.HeroesListVM.When.navigateToDetail
+                    )
+                    List(vm.characters, selection: listSelectionBinding) { character in
+                        HeroRowView(hero: character)
                             .onAppear {
                                 if character == vm.characters.last {
                                     vm.send(.userScrolledToLastVisibleCell)
                                 }
                             }
+                    }
+                    .navigationDestination(item: listSelectionBinding) { item in
+                        if let selectedVM = vm.detail {
+                            HeroDetailView(vm: selectedVM)
+                        } else {
+                            EmptyView()
                         }
-                        if vm.isBottomLoading {
-                            Section(footer: Text("Loading more...")) {
-                                EmptyView()
-                            }
-                            .frame(maxWidth: .infinity, alignment: .center)
+                    }
+                    if vm.isBottomLoading {
+                        Section(footer: Text("Loading more...")) {
+                            EmptyView()
                         }
+                        .frame(maxWidth: .infinity, alignment: .center)
                     }
                 }
             }
-//            .searchable(text: vm.bind(\.searchText, { ContentView.ViewModel.When.searchCharacters($0) }))
-            .searchable(text: $vm.searchText)
-            .onChange(of: vm.searchText) { _, newValue in
-                if newValue.isEmpty {
-                    vm.characters.removeAll()
-                    vm.send(.fetchCharacters)
-                } else {
-                    vm.send(.searchCharacters(newValue))
-                }
-            }
+            .searchable(text: vm.bind(\.searchText, { HeroesListView.HeroesListVM.When.searchCharacters($0) }))
             .alert("Error", isPresented: .constant(vm.isShowingError), actions: {
                 Button("OK") {
                     vm.send(.userTapOnErrorAlert)
@@ -65,30 +56,26 @@ struct HeroesListView: View {
             .navigationTitle("Marvel Heroes")
         }
         .onAppear {
-//            StatoscopeLogger.logLevel = [.errors, .when, .effects, /*.stateDiff,*/ .injection]
             vm.send(.fetchCharacters)
         }
     }
 }
 
 #Preview {
-    HeroesListView()
-        .environmentObject(HeroesListView.ViewModel()
-            .injectObject(Providers.defaultNetworkProvider)
-            .injectObject(Providers.defaultSystemProvider))
+    HeroesListView(vm: HeroesListView.HeroesListVM()
+        .injectObject(Providers.defaultNetworkProvider)
+        .injectObject(Providers.defaultSystemProvider))
 }
 
 #Preview {
-    HeroesListView()
-        .environmentObject(HeroesListView.ViewModel()
+    HeroesListView(vm: HeroesListView.HeroesListVM()
             .set(\.errorMessage, "Ha habido un error")
             .injectObject(Providers.defaultNetworkProvider)
             .injectObject(Providers.defaultSystemProvider))
 }
 
 #Preview {
-    HeroesListView()
-        .environmentObject(HeroesListView.ViewModel()
+    HeroesListView(vm: HeroesListView.HeroesListVM()
             .set(\.isBottomLoading, true)
             .set(\.characters, [.example])
             .injectObject(Providers.defaultNetworkProvider)
