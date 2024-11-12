@@ -514,5 +514,14 @@ final class MarvelHeroesUnitTest: XCTestCase {
         )
         .THEN(\.isLoading, equals: false)
         .THEN(\.comics, equals: Self.expectedComics)
+        .WHEN(
+            .fetchComicsCompleted(
+                .success(
+                    Self.emptyResponseMock.data(using: .utf8)!
+                )
+            )
+        )
+        .THEN(\.isLoading, equals: false)
+        .THEN(\.comics, equals: [])
     }
 }
