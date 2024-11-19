@@ -30,7 +30,7 @@ struct HeroDetailView: View {
                     .foregroundStyle(.secondary)
                 
                 VStack(alignment: .leading) {
-                    Text("Comics")
+                    Text("comicsText")
                         .font(.title2)
                         .fontWeight(.semibold)
                     

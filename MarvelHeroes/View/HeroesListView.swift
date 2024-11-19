@@ -16,7 +16,7 @@ struct HeroesListView: View {
         NavigationStack {
             Group {
                 if vm.isLoading {
-                    ProgressView("Fetching Heroes…")    
+                    ProgressView("fetchingText")
                 } else {
                     let listSelectionBinding: Binding<Int?> = vm.bind(
                        \.detail?.character.id,
@@ -38,7 +38,7 @@ struct HeroesListView: View {
                         }
                     }
                     if vm.isBottomLoading {
-                        Section(footer: Text("Loading more...")) {
+                        Section(footer: Text("loadingText")) {
                             EmptyView()
                         }
                         .frame(maxWidth: .infinity, alignment: .center)
@@ -46,14 +46,14 @@ struct HeroesListView: View {
                 }
             }
             .searchable(text: vm.bind(\.searchText, { HeroesListView.HeroesListVM.When.searchCharacters($0) }))
-            .alert("Error", isPresented: .constant(vm.isShowingError), actions: {
-                Button("OK") {
+            .alert("errorText", isPresented: .constant(vm.isShowingError), actions: {
+                Button("okText") {
                     vm.send(.userTapOnErrorAlert)
                 }
             }, message: {
                 Text(vm.errorMessage ?? "Unknown error")
             })
-            .navigationTitle("Marvel Heroes")
+            .navigationTitle("titleText")
         }
         .onAppear {
             vm.send(.fetchCharacters)
